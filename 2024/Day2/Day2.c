@@ -4,9 +4,6 @@
  *
  * Day 2, 2024
  * @author: Simon Engel
- *
- * Part Two:
- * A report is save as long as it
  */
 
 #include <stdio.h>
