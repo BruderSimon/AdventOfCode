@@ -5,3 +5,5 @@
  * Day 3, 2024
  * @author: Simon Engel
  */
+
+#include <stdio.h>
