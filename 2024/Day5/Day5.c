@@ -9,15 +9,17 @@
  */
 
 #include <stdio.h>
-
-#define ARRAY_SIZE 256
+#include <stdlib.h>
 
 struct rule{
   int num;
   int after[100];
 };
 
-int containsAfter(struct rule* r, int check){
+int containsAfter(struct rule* r, int check)
+{
+  if(r == NULL)
+    return 0;
   for (int i = 0; i < 100; i++){
     if(r->after[i] == check)
       return 1;
@@ -30,8 +32,8 @@ void part1(FILE* fptr){
   int character;
   int result = 0;
   int current_nummber = 0;
-  struct rule rules [100];
-  int update[256];
+  struct rule rules[100];
+  int* update = (int*) calloc(256, sizeof(int));
   struct rule* ruleptr = NULL;
   
   char line[256];
@@ -49,22 +51,26 @@ void part1(FILE* fptr){
 	isUpdate = 1;
 	update[updateNums++] = current_nummber;
 	current_nummber = 0;
-      }else if(line[i] == '\n'){
-	if(!isUpdate){
-	  ruleptr->after[current_nummber] = current_nummber;
-	  ruleptr = NULL;
-	}else{
-	  update[updateNums++] = current_nummber;
-	}
-	current_nummber = 0;
       }
     }
+    if(current_nummber != 0){
+      if(!isUpdate){
+	ruleptr->after[current_nummber] = current_nummber;
+	ruleptr = NULL;
+      }else{
+	update[updateNums++] = current_nummber;
+      }
+    }
+    current_nummber = 0;
     if(isUpdate){
       int isGoodUpdate = 0;
       for(int i = updateNums-1; i >= 0; i--){
-	 for(int d = i-1; d >= 0; d--){
+	 for(int d = i-1; d >= 0 && i > 0; d--){
+	   if(&rules[update[i]] == NULL)
+	     break;
 	   if(containsAfter(&rules[update[i]], update[d])){
 	     isGoodUpdate = 0;
+	     break;
 	   }else{
 	     isGoodUpdate = 1;
 	   }
@@ -76,7 +82,7 @@ void part1(FILE* fptr){
     }
   }
   printf("Result: %d \n", result);
-}
+  free(update);}
 
 int main()
 {
