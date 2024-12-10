@@ -31,7 +31,7 @@ void part1(FILE* fptr){
   
   int character;
   int result = 0;
-  int current_nummber = 0;
+  int current_number = 0;
   struct rule rules[100];
   int* update = (int*) calloc(256, sizeof(int));
   struct rule* ruleptr = NULL;
@@ -42,26 +42,26 @@ void part1(FILE* fptr){
   while (fgets(line, sizeof(line), fptr)){
     for (int i = 0;  line[i] != '\n'; i++) {
       if (line[i] >= '0' && line[i] <= '9'){
-	current_nummber = current_nummber * 10 + (line[i] - '0');
+	current_number = current_number * 10 + (line[i] - '0');
       }else if (line[i] == '|'){
-	ruleptr = &rules[current_nummber];
-	ruleptr->num = current_nummber;
-	current_nummber = 0;
+	ruleptr = &rules[current_number];
+	ruleptr->num = current_number;
+	current_number = 0;
       }else if (line[i] == ','){
 	isUpdate = 1;
-	update[updateNums++] = current_nummber;
-	current_nummber = 0;
+	update[updateNums++] = current_number;
+	current_number = 0;
       }
     }
-    if(current_nummber != 0){
+    if(current_number != 0){
       if(!isUpdate){
-	ruleptr->after[current_nummber] = current_nummber;
+	ruleptr->after[current_number] = current_number;
 	ruleptr = NULL;
       }else{
-	update[updateNums++] = current_nummber;
+	update[updateNums++] = current_number;
       }
     }
-    current_nummber = 0;
+    current_number = 0;
     if(isUpdate){
       int isGoodUpdate = 0;
       for(int i = updateNums-1; i >= 0; i--){
