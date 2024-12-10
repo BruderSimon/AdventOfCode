@@ -15,7 +15,37 @@
 void part1(FILE* fptr)
 {
   char matrix[ARRAY_SIZE][ARRAY_SIZE];
+  int character;
+  int row = 0;
+  int collumn = 0;
+  int guard_row = 0;
+  int guard_collumn = 0;
+  while ((character = fgetc(fptr)) != EOF){
+    char c = (char) character;
+    if(c == '\n'){
+      row++;
+      collumn = 0;
+    }else{
+      matrix[row][collumn] = c;
+      collumn++;
+    }
+    if(c == '<' || c == '>' || c == '^' || c == 'v'){
+      guard_row = row;
+      guard_collumn = collumn;
+    }
+  }
   
+  while(1){
+    if(matrix[guard_row][guard_collumn] == '<'){
+
+    }else if(matrix[guard_row][guard_collumn] == '>'){
+
+    }else if(matrix[guard_row][guard_collumn] == '^'){
+
+    }else if(matrix[guard_row][guard_collumn] == 'v'){
+
+    }
+  }
 }
 
 
