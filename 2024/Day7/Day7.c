@@ -8,53 +8,77 @@
  */
 #include <stdio.h>
 
-int checkOperators()
+int multEqu(int* constants, int start, int end)
 {
-
+  int result = 0;
+  for(int i = start; i < end; i++)
+    {
+      result *= constants[i];
+    }
+  return result;
 }
+int addEqu(int* constants, int start, int end)
+{
+  int result = 0;
+  for(int i = start; i < end; i++)
+    {
+      result += constants[i];
+    }
+  return result;
+}
+
 int part1(char* line)
 {
   int current_number = 0;
   int solution = 0;
   int constants[50]= {0};
   int constantsCount = 0;
-  for (int i = 0;  line[i] != '\n'; i++) {
-    if (line[i] >= '0' && line[i] <= '9'){
-      current_number = current_number * 10 + (line[i] - '0');
-    }else if (line[i] == ':'){
-      solution = current_number;
-      current_number = 0;
-    }else{
-      constants[constantsCount++] = current_number;
-      current_number = 0;
+  for (int i = 0;  line[i] != '\n'; i++)
+    {
+      if (line[i] >= '0' && line[i] <= '9')
+	{
+	  current_number = current_number * 10 + (line[i] - '0');
+	}
+      else if (line[i] == ':')
+	{
+	  solution = current_number;
+	  current_number = 0;
+	}
+      else
+	{
+	  constants[constantsCount++] = current_number;
+	  current_number = 0;
+	}
     }
-  }
   int resultPlus = 0;
   int resultMul = 1;
-  for(int i = 0; i < constantsCount; i++){
-    resultPlus += constants[i];
-    resultMul *= constants[i];
-  }
+  int resPM = 0;
+  int resMP = 1;
+  for(int i = 0; i < constantsCount; i++)
+    {
+      resultPlus += constants[i];
+      resultMul *= constants[i];
+      if(resPM
+    }
   if(resultPlus == solution ||resultMul == solution)
     return 1;
   
-  while(1){
-    
-  }
 }
 int main()
 {
   FILE* fptr;
   errno_t err = fopen_s(&fptr, "input.txt", "r");
     
-  if(err != 0) {
-    printf("Error while opening file: input.txt\n");
-    return 1;
-  }
+  if(err != 0)
+    {
+      printf("Error while opening file: input.txt\n");
+      return 1;
+    }
   char line[256];
-  while(fgets(line, sizeof(line), fptr)){
-    part1(line);
+  while(fgets(line, sizeof(line), fptr))
+    {
+      part1(line);
 
-  }
+    }
   fclose(fptr);
 }
