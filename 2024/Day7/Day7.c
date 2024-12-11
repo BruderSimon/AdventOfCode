@@ -8,29 +8,10 @@
  */
 #include <stdio.h>
 
-int multEqu(int* constants, int start, int end)
-{
-  int result = 0;
-  for(int i = start; i < end; i++)
-    {
-      result *= constants[i];
-    }
-  return result;
-}
-int addEqu(int* constants, int start, int end)
-{
-  int result = 0;
-  for(int i = start; i < end; i++)
-    {
-      result += constants[i];
-    }
-  return result;
-}
-
 int part1(char* line)
 {
   int current_number = 0;
-  int solution = 0;
+  long solution = 0;
   int constants[50]= {0};
   int constantsCount = 0;
   for (int i = 0;  line[i] != '\n'; i++)
@@ -50,19 +31,34 @@ int part1(char* line)
 	  current_number = 0;
 	}
     }
-  int resultPlus = 0;
-  int resultMul = 1;
-  int resPM = 0;
-  int resMP = 1;
-  for(int i = 0; i < constantsCount; i++)
-    {
-      resultPlus += constants[i];
-      resultMul *= constants[i];
-      if(resPM
+  int width = constantsCount-1;  // How many bits we want to count
+  int max = 1 << width;  // Calculate 2^width
+  int arr[max][width];
+  // Count from 0 to max-1
+  for (int i = 0; i < max; i++) {
+    for (int d = width - 1; d >= 0; d--) {
+      // Use bit shifting and masking to get each bit
+      int bit = (i >> d) & 1;
+      arr[i][d] = bit;
     }
-  if(resultPlus == solution ||resultMul == solution)
-    return 1;
-  
+  }
+  long result = constants[0];
+  for(int i = 0; i < max; i++){
+    for(int d = 1; d < width; d++){
+      if(arr[i][d] == 1){
+	result *= constants[d];
+      }else{
+	result += constants[d];
+      }
+    }
+    
+    if(result == solution){
+      printf("%long \n", result);
+      return 1;
+    }
+    int result = constants[0];
+  }
+  return 0;
 }
 int main()
 {
@@ -75,10 +71,12 @@ int main()
       return 1;
     }
   char line[256];
+  int resultP1 = 0;
   while(fgets(line, sizeof(line), fptr))
     {
-      part1(line);
+      resultP1 += part1(line);
 
     }
+  printf("Result Part 1: %d \n", resultP1);
   fclose(fptr);
 }
