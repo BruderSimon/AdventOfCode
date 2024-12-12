@@ -14,7 +14,7 @@ int part1(char* line)
   unsigned long long solution = 0;
   unsigned long long constants[50]= {0};
   int constantsCount = 0;
-  for (int i = 0;  line[i] != '\n'; i++)
+  for (int i = 0;  line[i] != '\n' && line[i] != '\0'; i++)
     {
       if (line[i] >= '0' && line[i] <= '9')
 	{
@@ -86,6 +86,6 @@ int main()
       resultP1 += part1(line);
 
     }
-  printf("Result Part 1: %d \n", resultP1);
+  printf("Result Part 1: %llu \n", resultP1);
   fclose(fptr);
 }
