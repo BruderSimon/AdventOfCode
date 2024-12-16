@@ -52,11 +52,11 @@ unsigned long long power(int base, int exp)
     }
     return result;
 }
-void convertToTernary(int* arr, int index, int N)
+void convertToTernary(int* arr, int index, int width, int N)
 {
   if (N == 0)
     {
-      for(int i = index; i >= 0;i--)
+      for(int i = index; i < width; i++)
         {
 	  arr[i] = 0;
         }
@@ -67,14 +67,15 @@ void convertToTernary(int* arr, int index, int N)
   if (x < 0)
     N += 1;
 
-  convertToTernary(arr, index-1, N);
+  convertToTernary(arr, index+1, width, N);
 
   if (x < 0)
     arr[index] =  x + (3 * -1);
   else
     arr[index] = x;
 }
-unsigned concatenate(unsigned x, unsigned y) {
+unsigned concatenate(unsigned x, unsigned y)
+{
     unsigned pow = 10;
     while(y >= pow)
         pow *= 10;
@@ -89,14 +90,7 @@ unsigned long long part2(unsigned long long* constants, int constantsCount, unsi
   
   for (int i = 0; i < max; i++)
     {
-      convertToTernary(arr, width-1, i);
-      for(int d = 0; d < width; d++)
-	{
-	  if(arr[d] == 2)
-	    {
-	      constants[d] = concatenate(constants[d], constants[d+1]);
-	    }
-	}
+      convertToTernary(arr, 0, width, i);
       for(int d = 0; d < width; d++)
 	{
 	  if(arr[d] == 1)
@@ -106,6 +100,10 @@ unsigned long long part2(unsigned long long* constants, int constantsCount, unsi
 	  else if(arr[d] == 0)
 	    {
 	      result += constants[d+1];
+	    }
+	  else if(arr[d] == 2)
+	    {
+	      result = concatenate(result, constants[d+1]);
 	    }
 	}
       if(result == solution)
@@ -165,5 +163,6 @@ int main()
 
     }
   printf("Result Part 1: %llu \n", resultP1);
+  printf("Result Part 2: %llu \n", resultP2);
   fclose(fptr);
 }
