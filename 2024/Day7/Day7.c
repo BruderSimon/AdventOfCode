@@ -2,7 +2,8 @@
  * Solution for Advent of Code
  * https://adventofcode.com/
  * 
- * Day 7, 2024:
+ * Day 7, 2024: Bridge Repair
+ * Check if an equations can be correct with the proper operands
  *
  * @author: Simon Engel
  */
@@ -74,7 +75,7 @@ void convertToTernary(int* arr, int index, int width, int N)
   else
     arr[index] = x;
 }
-unsigned concatenate(unsigned x, unsigned y)
+unsigned long long concatenate(unsigned long long x, unsigned long long y)
 {
     unsigned pow = 10;
     while(y >= pow)
@@ -157,9 +158,12 @@ int main()
 	    }
 	}
       constants[constantsCount++] = current_number;
-      
-      resultP1 += part1(constants, constantsCount, solution);
-      resultP2 += part2(constants, constantsCount, solution);
+      unsigned long long temp = part1(constants, constantsCount, solution);
+      resultP1 += temp;
+      if(temp == 0)
+	resultP2 += part2(constants, constantsCount, solution);
+      else
+	resultP2 += temp;
 
     }
   printf("Result Part 1: %llu \n", resultP1);
