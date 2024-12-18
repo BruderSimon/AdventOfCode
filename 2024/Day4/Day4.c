@@ -9,8 +9,6 @@
  */
 
 #include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
 
 #define MATRIX_SIZE 256
 #define TARGET "XMAS"
@@ -31,39 +29,32 @@ const int DIRECTIONS[8][2] =
 
 #define TARGET2 "MAS"
 #define TARGET_LENGTH2 3
-const int DIRECTIONS2[4][2] =
-  {
-    {1, 1},   // diagonal right down
-    {1, -1},  // diagonal left down
-    {-1, 1},  // diagonal right up
-    {-1, -1}, // diagonal left up
-  };
 
 /**
  * Checks if coordinates are within matrix bounds
  */
-static bool is_valid_position(int line, int row)
+static int is_valid_position(int line, int row)
 {
   return line >= 0 && line < MATRIX_SIZE && row >= 0 && row < MATRIX_SIZE;
 }
 
-static bool search_pattern(const char matrix[MATRIX_SIZE][MATRIX_SIZE], 
+static int search_pattern(const char matrix[MATRIX_SIZE][MATRIX_SIZE], 
                          int line, 
                          int row, 
                          int dir_idx, 
                          int char_idx) {
     // Base cases
     if (!is_valid_position(line, row)) {
-        return false;
+        return 0;
     }
     
     if (matrix[line][row] != TARGET[char_idx]) {
-        return false;
+        return 0;
     }
     
     // Found complete pattern
     if (char_idx == TARGET_LENGTH - 1) {
-        return true;
+        return 1;
     }
     
     // Continue search in same direction
@@ -75,33 +66,22 @@ static bool search_pattern(const char matrix[MATRIX_SIZE][MATRIX_SIZE],
         char_idx + 1
     );
 }
-static bool search_pattern2(const char matrix[MATRIX_SIZE][MATRIX_SIZE], 
-                         int line, 
-                         int row, 
-                         int dir_idx, 
-                         int char_idx) {
-    // Base cases
-    if (!is_valid_position(line, row)) {
-        return false;
-    }
-    
-    if (matrix[line][row] != TARGET2[char_idx]) {
-        return false;
-    }
-    
-    // Found complete pattern
-    if (char_idx == TARGET_LENGTH2 - 1) {
-        return true;
-    }
-    
-    // Continue search in same direction
-    return search_pattern(
-        matrix,
-        line + DIRECTIONS2[dir_idx][0],
-        row + DIRECTIONS2[dir_idx][1],
-        dir_idx,
-        char_idx + 1
-    );
+static int search_pattern2(const char matrix[MATRIX_SIZE][MATRIX_SIZE], int line, int row)
+{
+  int b1 = 0;
+  int b2 = 0;
+  if (line == 0 || row == 0 || line == MATRIX_SIZE-1 || row == MATRIX_SIZE-1)
+    return 0;
+
+  if((matrix[line-1][row+1] == 'M' && matrix[line+1][row-1] == 'S')
+     || (matrix[line-1][row+1] == 'S' && matrix[line+1][row-1] == 'M'))
+    b1 = 1;
+
+  if((matrix[line-1][row-1] == 'M' && matrix[line+1][row+1] == 'S')
+     || (matrix[line-1][row-1] == 'S' && matrix[line+1][row+1] == 'M'))
+    b2 = 1;
+  
+  return b1 && b2;
 }
 
 
@@ -122,26 +102,14 @@ int main(void) {
     int lines = 0;
     
     // Read file line by line
-    while (fgets(line, sizeof(line), fptr) && lines < MATRIX_SIZE) {
-        size_t len = strlen(line);
-        
-        // Remove newline if present
-        if (len > 0 && line[len-1] == '\n') {
-            line[len-1] = '\0';
-            len--;
-        }
-        
-        // Copy line to matrix
-        if (len >= MATRIX_SIZE) {
-            fprintf(stderr, "Line %d exceeds maximum length\n", lines + 1);
-            fclose(fptr);
-            return -1;
-        }
-        
-        strncpy_s(matrix[lines], MATRIX_SIZE, line, len);
-        matrix[lines][len] = '\0';
+    while (fgets(line, sizeof(line), fptr) && lines < MATRIX_SIZE)
+      {
+        for(int i = 0; line[i] != '\n' && line[i] != '\0'; i++)
+	  {
+	    matrix[lines][i] = line[i];
+	  };
         lines++;
-    }
+      }
     
     fclose(fptr);
     
@@ -151,7 +119,7 @@ int main(void) {
 	for (int j = 0; matrix[i][j] != '\0'; j++)
 	  {
 	    // Only start search from 'X'
-	    if (matrix[i][j] != TARGET[0] && matrix[i][j] != TARGET2[0])
+	    if (matrix[i][j] != TARGET[0] && matrix[i][j] != TARGET2[1])
 	      {
 		continue;
 	      }
@@ -167,15 +135,13 @@ int main(void) {
 		    }
 		}
 	      }
-	    else if(matrix[i][j] == TARGET2[0])
+	    else if(matrix[i][j] == TARGET2[1])
 	      {
 		
-		for (int dir = 0; dir < 4; dir++) {
-		  if (search_pattern2(matrix, i, j, dir, 0))
-		    {
-		      result2++;
-		    }
-		}
+		if (search_pattern2(matrix, i, j))
+		  {
+		    result2++;
+		  }
 		
 	      }
 	  }
