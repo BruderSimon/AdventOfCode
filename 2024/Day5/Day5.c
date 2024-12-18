@@ -28,7 +28,7 @@ int containsAfter(struct rule* r, int check)
 };
 int* getNumbers(char* line)
 {
-  int* arr = calloc(100, sizeof(int));
+  int* arr = (int*)calloc(100, sizeof(int));
   int count = 0;
   int current_number = 0;
   for (int i = 0;  line[i] != '\n' && line[i] != '\0'; i++)
@@ -43,18 +43,19 @@ int* getNumbers(char* line)
 	  current_number = 0;
 	}
     }
+  arr[count] = current_number;
   return arr;
 }
 void addRule(char* line, struct rule* rules)
 {
   int* num = getNumbers(line);
+  rules[num[0]].num = num[0];
   rules[num[0]].after[num[1]] = num[1];
   free(num);
 }
 int part1(char* line, struct rule* rules){
   
   int* update = getNumbers(line);
-
   int isGoodUpdate = 0;
   int count = 0;
   for(int i = 1; update[i] != 0; i++)
@@ -69,17 +70,44 @@ int part1(char* line, struct rule* rules){
 	      return 0;
 	    }
 	}
-      count = i;
+      count = i+1;
     }
+  int val = update[count/2]; // Don't access a freed register again...
   free(update);
-  return update[count/2];
-      
+  return val;
+}
+
+int part2(char* line, struct rule* rules)
+{
+  int* update = getNumbers(line);
+  int count = 0;
+  for(int i = 1; update[i] != 0; i++)
+    {
+      for(int d = i-1; d >= 0 && i > 0; d--)
+	{
+	  if(&rules[update[i]] == NULL)
+	    break;
+	  if(containsAfter(&rules[update[i]], update[d]))
+	    {
+	      // switching the variables
+	      update[i] += update[d];
+	      update[d] = update[i] - update[d];
+	      update[i] -= update[d];
+	      i = 1;
+	      break;
+	    }
+	}
+      count = i+1;
+    }
+  int val = update[count/2]; // Don't access a freed register again...
+  free(update);
+  return val;
 }
 
 int main()
 {
   FILE* fptr;
-  errno_t err = fopen_s(&fptr, "Test.txt", "r");
+  errno_t err = fopen_s(&fptr, "input.txt", "r");
     
   if(err != 0) {
     printf("Error while opening file: input.txt\n");
@@ -87,8 +115,9 @@ int main()
   }
 
   int result1 = 0;
+  int result2 = 0;
   char line[256];
-  struct rule rules[100];
+  struct rule rules[100] = {0};
   int isUpdate = 0;
    while (fgets(line, sizeof(line), fptr))
     {
@@ -97,9 +126,16 @@ int main()
 
       if(line[0] == '\n')
 	isUpdate = 1;
-	
-      result1 += part1(line, rules);
+      
+      if(isUpdate)
+	{
+	  int p1 = part1(line, rules);
+	  result1 += p1;
+	  if(p1 == 0)
+	    result2 += part2(line,rules);
+	}
     }
    printf("Result Part 1: %d \n", result1);
+   printf("Result Part 2: %d \n", result2);
   fclose(fptr);
 }
