@@ -11,74 +11,70 @@
 #include <stdio.h>
 
 #define ARRAY_SIZE 130
+static char matrix[ARRAY_SIZE][ARRAY_SIZE];
 
-void part1(char matrix[ARRAY_SIZE][ARRAY_SIZE], int guard_row, int guard_collumn)
+void part1(int guard_row, int guard_collumn)
 {
-  char* guard = "<^>v";
-  
-  if(matrix[guard_row][guard_collumn] == '<')
+  if(guard_collumn < 0 || guard_collumn >= 130 ||
+     guard_row < 0 || guard_row >= 130)
+    return;
+      
+  switch(matrix[guard_row][guard_collumn])
     {
-      if(guard_collumn < 0 || guard_collumn >= 130 ||
-	 guard_row < 0 || guard_row >= 130)
-	return;
-      switch(matrix[guard_row][guard_collumn])
-	{
-	case '<':
+    case '<':
 	   
-	  if(matrix[guard_row][guard_collumn-1] == '#')
-	    {
-	      matrix[guard_row][guard_collumn] = '^';
-	      part1(matrix, guard_row, guard_collumn);
-	    }
-	  else
-	    {
-	      matrix[guard_row][guard_collumn] = 'X';
-	      matrix[guard_row][guard_collumn-1] = '<';
-	      part1(matrix, guard_row, guard_collumn-1);
-	    }
-	  break;
-	case '^':
-	  
-	  if(matrix[guard_row-1][guard_collumn] == '#')
-	    {
-	      matrix[guard_row][guard_collumn] = '>';
-	      part1(matrix, guard_row, guard_collumn);
-	    }
-	  else
-	    {
-	      matrix[guard_row][guard_collumn] = 'X';
-	      matrix[guard_row-1][guard_collumn] = '^';
-	      part1(matrix, guard_row-1, guard_collumn);
-	    }
-	  break;
-	case '>':
-	  if(matrix[guard_row][guard_collumn+1] == '#')
-	    {
-	      matrix[guard_row][guard_collumn] = 'v';
-	      part1(matrix, guard_row, guard_collumn);
-	    }
-	  else
-	    {
-	      matrix[guard_row][guard_collumn] = 'X';
-	      matrix[guard_row][guard_collumn+1] = '^';
-	      part1(matrix, guard_row, guard_collumn+1);
-	    }
-	  break;
-	case 'v':
-	  if(matrix[guard_row+1][guard_collumn] == '#')
-	    {
-	      matrix[guard_row][guard_collumn] = '<';
-	      part1(matrix, guard_row, guard_collumn);
-	    }
-	  else
-	    {
-	      matrix[guard_row][guard_collumn] = 'X';
-	      matrix[guard_row][guard_collumn+1] = 'v';
-	      part1(matrix, guard_row+1, guard_collumn);
-	    }
-	  break;
+      if(matrix[guard_row][guard_collumn-1] == '#')
+	{
+	  matrix[guard_row][guard_collumn] = '^';
+	  part1(guard_row, guard_collumn);
 	}
-
+      else
+	{
+	  matrix[guard_row][guard_collumn] = 'X';
+	  matrix[guard_row][guard_collumn-1] = '<';
+	  part1(guard_row, guard_collumn-1);
+	}
+      break;
+    case '^':
+	  
+      if(matrix[guard_row-1][guard_collumn] == '#')
+	{
+	  matrix[guard_row][guard_collumn] = '>';
+	  part1(guard_row, guard_collumn);
+	}
+      else
+	{
+	  matrix[guard_row][guard_collumn] = 'X';
+	  matrix[guard_row-1][guard_collumn] = '^';
+	  part1(guard_row-1, guard_collumn);
+	}
+      break;
+    case '>':
+      if(matrix[guard_row][guard_collumn+1] == '#')
+	{
+	  matrix[guard_row][guard_collumn] = 'v';
+	  part1(guard_row, guard_collumn);
+	}
+      else
+	{
+	  matrix[guard_row][guard_collumn] = 'X';
+	  matrix[guard_row][guard_collumn+1] = '^';
+	  part1(guard_row, guard_collumn+1);
+	}
+      break;
+    case 'v':
+      if(matrix[guard_row+1][guard_collumn] == '#')
+	{
+	  matrix[guard_row][guard_collumn] = '<';
+	  part1(guard_row, guard_collumn);
+	}
+      else
+	{
+	  matrix[guard_row][guard_collumn] = 'X';
+	  matrix[guard_row][guard_collumn+1] = 'v';
+	  part1(guard_row+1, guard_collumn);
+	}
+      break;
     }
 }
 
@@ -86,14 +82,13 @@ void part1(char matrix[ARRAY_SIZE][ARRAY_SIZE], int guard_row, int guard_collumn
 int main()
 {
   FILE* fptr;
-  errno_t err = fopen_s(&fptr, "input.txt", "r");
+  errno_t err = fopen_s(&fptr, "Test.txt", "r");
     
   if(err != 0)
     {
       printf("Error while opening file: input.txt\n");
       return 1;
     }
-  char matrix[ARRAY_SIZE][ARRAY_SIZE];
   int character;
   int row = 0;
   int collumn = 0;
@@ -109,15 +104,21 @@ int main()
 	}
       else
 	{
-	  matrix[row][collumn] = c;
-	  collumn++;
+	  matrix[row][collumn++] = c;
 	}
       if(c == '<' || c == '>' || c == '^' || c == 'v')
 	{
 	  guard_row = row;
-	  guard_collumn = collumn;
+	  guard_collumn = collumn-1;
 	}
     }
   fclose(fptr);
-  part1(matrix, guard_row, guard_collumn);
+  part1(guard_row, guard_collumn);
+  int result = 0;
+  
+  for(int i = 0; i < ARRAY_SIZE; i++)
+    for(int d = 0; d < ARRAY_SIZE; d++)
+      if(matrix[i][d] == 'X')
+	result++;
+  printf("Result Part1: %d \n", result);
 }
