@@ -15,14 +15,19 @@ static char matrix[ARRAY_SIZE][ARRAY_SIZE];
 
 void part1(int guard_row, int guard_collumn)
 {
-  if(guard_collumn < 0 || guard_collumn >= 130 ||
-     guard_row < 0 || guard_row >= 130)
+  if(guard_collumn < 0 || guard_collumn >= ARRAY_SIZE ||
+     guard_row < 0 || guard_row >= ARRAY_SIZE)
     return;
       
   switch(matrix[guard_row][guard_collumn])
     {
     case '<':
-	   
+      if(guard_collumn == 0)
+	{
+	  matrix[guard_row][guard_collumn] = 'X';
+	  return;
+	}
+	
       if(matrix[guard_row][guard_collumn-1] == '#')
 	{
 	  matrix[guard_row][guard_collumn] = '^';
@@ -36,7 +41,11 @@ void part1(int guard_row, int guard_collumn)
 	}
       break;
     case '^':
-	  
+      if(guard_row == 0)
+	{
+	  matrix[guard_row][guard_collumn] = 'X';
+	  return;
+	}
       if(matrix[guard_row-1][guard_collumn] == '#')
 	{
 	  matrix[guard_row][guard_collumn] = '>';
@@ -50,6 +59,11 @@ void part1(int guard_row, int guard_collumn)
 	}
       break;
     case '>':
+      if(guard_collumn == ARRAY_SIZE -1)
+	{
+	  matrix[guard_row][guard_collumn] = 'X';
+	  return;
+	}
       if(matrix[guard_row][guard_collumn+1] == '#')
 	{
 	  matrix[guard_row][guard_collumn] = 'v';
@@ -58,11 +72,16 @@ void part1(int guard_row, int guard_collumn)
       else
 	{
 	  matrix[guard_row][guard_collumn] = 'X';
-	  matrix[guard_row][guard_collumn+1] = '^';
+	  matrix[guard_row][guard_collumn+1] = '>';
 	  part1(guard_row, guard_collumn+1);
 	}
       break;
     case 'v':
+      if(guard_row == ARRAY_SIZE - 1)
+	{
+	  matrix[guard_row][guard_collumn] = 'X';
+	  return;
+	}
       if(matrix[guard_row+1][guard_collumn] == '#')
 	{
 	  matrix[guard_row][guard_collumn] = '<';
@@ -71,18 +90,22 @@ void part1(int guard_row, int guard_collumn)
       else
 	{
 	  matrix[guard_row][guard_collumn] = 'X';
-	  matrix[guard_row][guard_collumn+1] = 'v';
+	  matrix[guard_row+1][guard_collumn] = 'v';
 	  part1(guard_row+1, guard_collumn);
 	}
       break;
     }
 }
 
+int checkLoop(int guard_collumn, int guard_row)
+{
+
+}
 
 int main()
 {
   FILE* fptr;
-  errno_t err = fopen_s(&fptr, "Test.txt", "r");
+  errno_t err = fopen_s(&fptr, "input.txt", "r");
     
   if(err != 0)
     {
